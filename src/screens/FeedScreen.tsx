@@ -3,7 +3,6 @@ import {
   View, FlatList, Dimensions, TouchableOpacity,
   Text, StyleSheet, ActivityIndicator
 } from 'react-native';
-import Video from 'react-native-video';
 import { getFeed } from '../services/api';
 
 const { height } = Dimensions.get('window');
@@ -30,18 +29,21 @@ export default function FeedScreen() {
     });
   };
 
-  if (loading) return (
-    <View style={styles.center}>
-      <ActivityIndicator size="large" color="#ff2d55" />
-    </View>
-  );
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#ff2d55" />
+      </View>
+    );
+  }
 
-  if (!videos.length) return (
-    <View style={styles.center}>
-      <Text style={styles.empty}>🎬</Text>
-      <Text style={styles.emptyText}>Aucune vidéo</Text>
-    </View>
-  );
+  if (!videos.length) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.emptyText}>Aucune video</Text>
+      </View>
+    );
+  }
 
   return (
     <FlatList
@@ -49,25 +51,16 @@ export default function FeedScreen() {
       keyExtractor={(item) => item.id.toString()}
       pagingEnabled
       showsVerticalScrollIndicator={false}
-      onViewableItemsChanged={({ viewableItems }) => {
-        if (viewableItems[0]) setActiveIndex(viewableItems[0].index ?? 0);
-      }}
       renderItem={({ item, index }) => (
         <View style={styles.videoContainer}>
-          <Video
-            source={{ uri: `${API_URL}${item.url}` }}
-            style={styles.video}
-            resizeMode="cover"
-            repeat
-            paused={index !== activeIndex}
-          />
+          <View style={styles.placeholder}>
+            <Text style={styles.placeholderText}>VIDEO</Text>
+          </View>
           <View style={styles.actions}>
-            <TouchableOpacity onPress={() => toggleLike(item.id)}>
-              <Text style={styles.actionIcon}>{liked.has(item.id) ? '❤️' : '🤍'}</Text>
-              <Text style={styles.actionText}>J'aime</Text>
+            <TouchableOpacity onPress={() => toggleLike(item.id)} style={styles.actionBtn}>
+              <Text style={styles.actionText}>{liked.has(item.id) ? 'Aime' : 'Jaime'}</Text>
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Text style={styles.actionIcon}>💬</Text>
+            <TouchableOpacity style={styles.actionBtn}>
               <Text style={styles.actionText}>Commenter</Text>
             </TouchableOpacity>
           </View>
@@ -82,13 +75,13 @@ export default function FeedScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, backgroundColor: '#0a0a0a', alignItems: 'center', justifyContent: 'center' },
-  empty: { fontSize: 56 },
-  emptyText: { color: '#fff', fontSize: 20, fontWeight: 'bold', marginVertical: 8 },
+  emptyText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
   videoContainer: { width: '100%', height, backgroundColor: '#000' },
-  video: { ...StyleSheet.absoluteFillObject },
+  placeholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  placeholderText: { color: '#333', fontSize: 24 },
   actions: { position: 'absolute', right: 12, bottom: 120, alignItems: 'center', gap: 20 },
-  actionIcon: { fontSize: 32, textAlign: 'center' },
-  actionText: { color: '#fff', fontSize: 11, textAlign: 'center' },
+  actionBtn: { alignItems: 'center', marginBottom: 16 },
+  actionText: { color: '#fff', fontSize: 13 },
   info: { position: 'absolute', left: 12, bottom: 100 },
   username: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
 });
