@@ -3,10 +3,11 @@ workflows:
     name: FLICK Android Build
     max_build_duration: 60
     environment:
+      node: 20.14.0
       java: 17
     scripts:
       - name: Install dependencies
-        script: npm install --legacy-peer-deps
+        script: npm ci --legacy-peer-deps
       - name: Build Android APK
         script: |
           cd android

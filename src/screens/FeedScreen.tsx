@@ -1,27 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  View, FlatList, Dimensions, TouchableOpacity,
-  Text, StyleSheet, ActivityIndicator
+  View,
+  FlatList,
+  Dimensions,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
-import { getFeed } from '../services/api';
+import {getFeed} from '../services/api';
 
-const { height } = Dimensions.get('window');
-const API_URL = 'http://localhost:3000';
+const {height} = Dimensions.get('window');
 
 export default function FeedScreen() {
-  const [videos, setVideos] = useState([]);
+  const [videos, setVideos] = useState<{id: string}[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [liked, setLiked] = useState(new Set());
+  const [liked, setLiked] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    getFeed().then(res => {
-      setVideos(res.data.videos);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    getFeed()
+      .then(res => {
+        setVideos(res.data.videos);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
-  const toggleLike = (id) => {
+  const toggleLike = (id: string) => {
     setLiked(prev => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
@@ -48,17 +53,21 @@ export default function FeedScreen() {
   return (
     <FlatList
       data={videos}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={item => item.id.toString()}
       pagingEnabled
       showsVerticalScrollIndicator={false}
-      renderItem={({ item, index }) => (
+      renderItem={({item}) => (
         <View style={styles.videoContainer}>
           <View style={styles.placeholder}>
             <Text style={styles.placeholderText}>VIDEO</Text>
           </View>
           <View style={styles.actions}>
-            <TouchableOpacity onPress={() => toggleLike(item.id)} style={styles.actionBtn}>
-              <Text style={styles.actionText}>{liked.has(item.id) ? 'Aime' : 'Jaime'}</Text>
+            <TouchableOpacity
+              onPress={() => toggleLike(item.id)}
+              style={styles.actionBtn}>
+              <Text style={styles.actionText}>
+                {liked.has(item.id) ? 'Aime' : 'Jaime'}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionBtn}>
               <Text style={styles.actionText}>Commenter</Text>
@@ -74,14 +83,25 @@ export default function FeedScreen() {
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, backgroundColor: '#0a0a0a', alignItems: 'center', justifyContent: 'center' },
-  emptyText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
-  videoContainer: { width: '100%', height, backgroundColor: '#000' },
-  placeholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  placeholderText: { color: '#333', fontSize: 24 },
-  actions: { position: 'absolute', right: 12, bottom: 120, alignItems: 'center', gap: 20 },
-  actionBtn: { alignItems: 'center', marginBottom: 16 },
-  actionText: { color: '#fff', fontSize: 13 },
-  info: { position: 'absolute', left: 12, bottom: 100 },
-  username: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
+  center: {
+    flex: 1,
+    backgroundColor: '#0a0a0a',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {color: '#fff', fontSize: 20, fontWeight: 'bold'},
+  videoContainer: {width: '100%', height, backgroundColor: '#000'},
+  placeholder: {flex: 1, alignItems: 'center', justifyContent: 'center'},
+  placeholderText: {color: '#333', fontSize: 24},
+  actions: {
+    position: 'absolute',
+    right: 12,
+    bottom: 120,
+    alignItems: 'center',
+    gap: 20,
+  },
+  actionBtn: {alignItems: 'center', marginBottom: 16},
+  actionText: {color: '#fff', fontSize: 13},
+  info: {position: 'absolute', left: 12, bottom: 100},
+  username: {color: '#fff', fontWeight: 'bold', fontSize: 15},
 });
